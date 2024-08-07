@@ -4,7 +4,12 @@
 */
 
 function isPalindrome(str) {
-  return true;
+  const reversedStr = str.toLowerCase().replace(/[^\w]/g, "").split("").reverse().join("")
+
+  return reversedStr === str.toLowerCase().replace(/[^\w]/g, "")
 }
 
 module.exports = isPalindrome;
+
+
+console.log(isPalindrome("kunal"))
