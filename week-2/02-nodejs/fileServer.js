@@ -12,10 +12,55 @@
     - For any other route not defined in the server return 404
     Testing the server - run `npm run test-fileServer` command in terminal
  */
+const { error } = require('console');
 const express = require('express');
 const fs = require('fs');
 const path = require('path');
 const app = express();
 
+// app.use(express.json());
+
+
+// app.get("/files", (_, res)=>{
+//   fs.readdir(path.join(__dirname, "./files"), (err, allFiles)=>{
+//     if(err)return res.status(500).json({error: "Faild to retrive files"})
+//       res.json(allFiles)
+//   })
+// })
+
+
+// app.get("/files/:filename", (req, res)=>{
+//   const filename = req.params.filename;
+//   const filepath = path.join(__dirname, "./files/",filename);
+//   fs.readFile(filepath, "utf-8", (err,data)=>{
+//     if(err) return res.status(404).send("file not found")
+//       return res.send(200).send(data)
+//   })
+// })
+
+app.use(express.json());
+
+app.get("/files", (_, res) => {
+  fs.readdir(path.join(__dirname, "./files/"), (err, allFiles) => {
+    if (err) return res.status(500).json({ error: "Failed to retrieve files" });
+    res.json(allFiles);
+  });
+});
+
+app.get("/file/:filename", (req, res) => {
+  const filename = req.params.filename;
+  const filepath = path.join(__dirname, "./files/", filename);
+  fs.readFile(filepath, "utf8", (err, data) => {
+    if (err) return res.status(404).send("File not found");
+    return res.status(200).send(data);
+  });
+});
+
+
+app.use((req, res) => {
+  res.status(404).send("Route not found");
+});
+
+// app.listen(3000)
 
 module.exports = app;
