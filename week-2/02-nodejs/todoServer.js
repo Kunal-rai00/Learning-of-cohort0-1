@@ -39,11 +39,72 @@
 
   Testing the server - run `npm run test-todoServer` command in terminal
  */
-  const express = require('express');
-  const bodyParser = require('body-parser');
-  
-  const app = express();
-  
-  app.use(bodyParser.json());
-  
-  module.exports = app;
+// const express = require("express");
+// const bodyParser = require("body-parser");
+// const fs = require("fs").promises;
+// const crypto = require("crypto");
+
+const express = require('express');
+const { v4: uuidv4 } = require('uuid');
+
+const app = express();
+app.use(express.json());
+
+let todos = [];
+
+// Create a new todo item
+app.post('/todos', (req, res) => {
+  const { title, description } = req.body;
+  const newTodo = { id: uuidv4(), title, description };
+  todos.push(newTodo);
+  res.status(201).json(newTodo);
+});
+
+// Retrieve all todo items
+app.get('/todos', (req, res) => {
+  res.status(200).json(todos);
+});
+
+// Retrieve a specific todo item by ID
+app.get('/todos/:id', (req, res) => {
+  const { id } = req.params;
+  const todo = todos.find(t => t.id === id);
+  if (todo) {
+    res.status(200).json(todo);
+  } else {
+    res.status(404).json({ message: 'Todo not found' });
+  }
+});
+
+// Update a specific todo item
+app.put('/todos/:id', (req, res) => {
+  const { id } = req.params;
+  const { title, description } = req.body;
+  const todoIndex = todos.findIndex(t => t.id === id);
+
+  if (todoIndex !== -1) {
+    todos[todoIndex] = { ...todos[todoIndex], title, description };
+    res.status(200).json(todos[todoIndex]);
+  } else {
+    res.status(404).json({ message: 'Todo not found' });
+  }
+});
+
+// Delete a specific todo item
+app.delete('/todos/:id', (req, res) => {
+  const { id } = req.params;
+  const todoIndex = todos.findIndex(t => t.id === id);
+
+  if (todoIndex !== -1) {
+    todos.splice(todoIndex, 1);
+    res.status(200).json({ message: 'Todo deleted successfully' });
+  } else {
+    res.status(404).json({ message: 'Todo not found' });
+  }
+});
+
+module.exports = app;
+
+
+
+// module.exports = app;
